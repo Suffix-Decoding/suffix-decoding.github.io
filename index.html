@@ -1,0 +1,544 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="description"
+        content="SuffixDecoding: Extreme Speculative Decoding for Emerging AI Applications">
+  <meta name="keywords" content="SuffixDecoding, Speculative Decoding, LLM Inference, AI Agents">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>SuffixDecoding: Extreme Speculative Decoding for Emerging AI Applications</title>
+
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+        rel="stylesheet">
+
+  <link rel="stylesheet" href="./static/css/bulma.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
+  <link rel="stylesheet" href="./static/css/bulma-slider.min.css">
+  <link rel="stylesheet" href="./static/css/fontawesome.all.min.css">
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/gh/jpswalsh/academicons@1/css/academicons.min.css">
+  <link rel="stylesheet" href="./static/css/index.css">
+  <link rel="icon" type="image/png" href="./images/neurips-logo.png">
+  <style>
+    details > summary {
+      list-style: none;
+    }
+    details > summary::-webkit-details-marker {
+      display: none;
+    }
+  </style>
+
+  <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+  <script defer src="./static/js/fontawesome.all.min.js"></script>
+  <script src="./static/js/bulma-carousel.min.js"></script>
+  <script src="./static/js/bulma-slider.min.js"></script>
+  <script src="./static/js/index.js"></script>
+</head>
+<body>
+
+<section class="hero" style="margin-bottom: 0px;">
+  <div class="hero-body">
+    <div class="container is-max-desktop">
+      <div class="columns is-centered">
+        <div class="column has-text-centered">
+          <h1 class="title is-3 publication-title">SuffixDecoding: Extreme Speculative Decoding for <br>Emerging AI Applications</h1>
+          <div class="is-size-4" style="margin-top: 15px; margin-bottom: 20px;">
+            <span style="color: #888888; font-weight: 400;">
+              NeurIPS 2025 Spotlight 🔦
+            </span>
+          </div>
+          <div class="is-size-5 publication-authors">
+            <span class="author-block">
+              <a href="https://www.gabrieleoliaro.com/">Gabriele Oliaro<sup>1,2</sup></a></span>
+              <span class="author-block", style="padding-left:30px">
+                <a href="https://www.cs.cmu.edu/~zhihaoj2/">Zhihao Jia<sup>2</sup></a></span>
+                <span class="author-block", style="padding-left:30px">
+                  <a href="https://spacemanidol.com/">Daniel Campos<sup>1</sup></a></span>
+                  <span class="author-block", style="padding-left:30px">
+                    <a href="https://www.snowflake.com/en/blog/authors/aurick-qiao/">Aurick Qiao<sup>1</sup></a></span>
+          </div>
+
+          <div class="is-size-5 publication-authors">
+            <span class="author-block"><sup>1</sup>Snowflake AI Research</span>
+            <span class="author-block", style="padding-left:30px"><sup>2</sup>Carnegie Mellon University</span>
+          </div>
+
+          <div class="column has-text-centered">
+            <div class="publication-links">
+              <!-- PDF Link. -->
+              <span class="link-block">
+                <a href="https://arxiv.org/abs/2411.04975"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-file-pdf"></i>
+                  </span>
+                  <span>Paper</span>
+                </a>
+              </span>
+              <span class="link-block">
+                <a href="https://github.com/snowflakedb/ArcticInference"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fab fa-github"></i>
+                  </span>
+                  <span>Code</span>
+                  </a>
+              </span>
+              <span class="link-block">
+                <a href="https://arcticinference.readthedocs.io/en/latest/suffix-decoding.html"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-book"></i>
+                  </span>
+                  <span>Docs</span>
+                  </a>
+              </span>
+              <span class="link-block">
+                <a href="https://www.snowflake.com/en/engineering-blog/fast-speculative-decoding-vllm-arctic/"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-blog"></i>
+                  </span>
+                  <span>Blog Post</span>
+                  </a>
+              </span>
+
+            </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<section class="hero teaser">
+  <div class="container is-max-desktop">
+    <div class="hero-body">
+      <center><img src="./images/suffix-decoding.png" alt="SuffixDecoding Overview" width="100%"></center>
+      <div class="content has-text-justified">
+        <b>Overview of SuffixDecoding's algorithm.</b> Two suffix trees track ongoing inference (top-left) and previous outputs (bottom-left). 
+        SuffixDecoding uses these trees to find matching patterns based on recently generated tokens. It constructs a speculation tree (middle) 
+        by selecting the most likely continuations, scoring them based on frequency statistics. Finally, the best candidate is verified by 
+        the LLM in a single forward pass (right), with accepted tokens (shown in green) being added to the output and used for the next round of speculation.
+      </div>
+    </div>
+  </div>
+</section>
+
+
+<hr>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <!-- Abstract. -->
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Abstract</h2>
+        <div class="content has-text-justified">
+          <p>
+            Speculative decoding is widely adopted to reduce latency in large language model (LLM) inference by 
+            leveraging smaller draft models capable of handling diverse user tasks. However, emerging AI applications, 
+            such as LLM-based agents, present unique workload characteristics: instead of diverse independent requests, 
+            agentic frameworks typically submit repetitive inference requests, such as multi-agent pipelines performing 
+            similar subtasks or self-refinement loops iteratively enhancing outputs. These workloads result in long and 
+            highly predictable sequences, which current speculative decoding methods do not effectively exploit.
+          </p>
+          <p>
+            To address this gap, we introduce <b>SuffixDecoding</b>, a novel method that utilizes efficient suffix trees 
+            to cache long token sequences from prompts and previous outputs. By adaptively speculating more tokens when 
+            acceptance likelihood is high and fewer when it is low, SuffixDecoding effectively exploits opportunities for 
+            longer speculations while conserving computation when those opportunities are limited.
+          </p>
+          <p>
+            Evaluations on agentic benchmarks, including SWE-Bench and AgenticSQL (a multi-agent SQL generation workflow), 
+            demonstrate that SuffixDecoding achieves speedups of up to <b>5.3×</b>, outperforming state-of-the-art methods—<b>2.8×</b> 
+            faster than model-based approaches like EAGLE-2/3 and <b>1.9×</b> faster than model-free approaches such as Token Recycling.
+          </p>
+        </div>
+      </div>
+    </div>
+
+</section>
+<hr>
+
+
+<section class="section">
+  <div class="container is-max-desktop">
+  <div class="columns is-centered has-text-centered">
+    <div class="column is-four-fifths">
+      <h2 class="title is-3">Method</h2>
+
+      <h2 class="title is-5">Suffix Tree Construction and Pattern Matching</h2>
+
+    <div class="content has-text-justified">
+      <p>
+        The goal of SuffixDecoding is to enable fast, adaptive speculative decoding over long sequences, particularly suited 
+        for agentic applications where repeated inference calls often contain highly predictable and overlapping token sequences. 
+        To support fast speculation, SuffixDecoding builds a <b>suffix tree</b> over the tokens in the current and prior requests, 
+        and uses the suffix tree to generate speculative tokens.
+      </p>
+      <p>
+        SuffixDecoding maintains two different suffix trees: a <b>global</b> tree for previously generated outputs, and a separate 
+        <b>per-request</b> tree for the current ongoing inference request. This circumvents the complexities and overheads due to 
+        synchronizing suffix tree updates from multiple concurrent requests. The global tree can be constructed offline in O(n) time, 
+        while the per-request tree can be efficiently constructed and updated online.
+      </p>
+    </div>
+  </div>
+  </div>
+
+  <div class="columns is-centered has-text-centered">
+    <div class="column is-four-fifths">
+
+      <br>
+      <h2 class="title is-5">Adaptive Speculation Strategy</h2>
+
+      <center><img src="./images/pattern_vs_accept.png" alt="Pattern vs Accept" width="45%" style="display: inline-block; margin-right: 2%;"><img src="./images/max_spec_tokens_vs_factor.png" alt="Adaptive MAX_SPEC" width="45%" style="display: inline-block;"></center>
+
+      <div class="content has-text-justified">
+        <p>
+          <b>Left:</b> The mean number of accepted tokens increases with the length of the pattern match, which motivates 
+          MAX_SPEC = αp. <b>Right:</b> Using an adaptive MAX_SPEC achieves a better trade-off between acceptance rate and 
+          speculative speedup compared to a constant MAX_SPEC.
+        </p>
+        <p>
+          The key innovation is <b>adaptive speculation</b>: SuffixDecoding dynamically adjusts the number of speculated tokens 
+          based on the quality of matches found in the suffix tree. When the method detects strong pattern repetition, it 
+          speculates aggressively (up to hundreds of tokens), maximizing parallelism in verification. When patterns are less 
+          predictable, it reduces speculation to avoid wasted computation.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <div class="columns is-centered has-text-centered">
+    <div class="column is-four-fifths">
+      <br>
+      <h2 class="title is-5">Speculation Tree Expansion and Scoring</h2>
+
+      <center><img src="./images/speculation-tree-example.png" alt="Speculation Tree Example" width="80%"></center>
+
+      <div class="content has-text-justified">
+        <p>
+          <b>Example speculation tree containing 66 tokens for the AgenticSQL Extract task.</b> SuffixDecoding builds the 
+          speculation tree by greedily adding leaf nodes that it believes to be the most likely to be accepted during verification, 
+          based on frequency statistics captured within the suffix trees.
+        </p>
+        <p>
+          To select a smaller more likely sub-tree for practical speculative verification, SuffixDecoding starts with a pattern 
+          match node and grows a sub-tree greedily by expanding one leaf node at a time. The method uses empirical probability 
+          estimates to score each potential expansion and selects the nodes most likely to be accepted.
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+</section>
+
+
+<hr>
+
+<section class="section">
+  <div class="container is-max-desktop">
+  <div class="columns is-centered has-text-centered">
+    <div class="column is-four-fifths">
+      <h2 class="title is-3">Results</h2>
+
+      <h2 class="title is-5">Performance on Agentic Benchmarks</h2>
+
+    <center><img src="./images/benchmark_comparison.png" alt="Benchmark Comparison" width="100%"></center>
+
+    <div class="content has-text-justified">
+      <p>
+        <b>Speculative speedups (top) and mean accepted tokens per step (bottom)</b> compared to vanilla decoding for 
+        SuffixDecoding and baseline methods on three benchmarks: Spec-Bench, AgenticSQL, and SWE-Bench.
+      </p>
+      <p>
+        On agentic workloads, SuffixDecoding outperforms all baselines. In AgenticSQL, SuffixDecoding obtains a mean speedup 
+        of <b>5.3×</b> over vanilla decoding, a <b>2.8×</b> improvement over EAGLE-2/3, and <b>1.9×</b> higher than Token Recycling. 
+        In SWE-Bench, SuffixDecoding obtains a mean speedup of <b>2.5×</b> over vanilla decoding and <b>1.7×</b> improvement over 
+        Prompt-Lookup Decoding. SuffixDecoding's superior performance can be attributed to its consistently higher mean accepted 
+        tokens per decoding step.
+      </p>
+      <p>
+        The <b>hybrid approach</b> of SuffixDecoding + EAGLE-3 achieves the best of both worlds: we speculate with the faster 
+        SuffixDecoding method whenever possible and fall back to EAGLE-3 when the speculation score is too low. The hybrid 
+        approach performs well across both agentic and non-agentic workloads.
+      </p>
+    </div>
+  </div>
+  </div>
+
+  <div class="columns is-centered has-text-centered">
+    <div class="column is-four-fifths">
+      <br>
+      <h2 class="title is-5">End-to-End SWE-Bench on vLLM</h2>
+
+      <center><img src="./images/combined_latency_breakdown.png" alt="vLLM SWE-Bench Results" width="100%"></center>
+
+      <div class="content has-text-justified">
+        <p>
+          <b>End-to-end task-completion time of the OpenHands agent on SWE-Bench Verified.</b> The benchmarks are run with 
+          a concurrency of 8 tasks running simultaneously. vLLM is deployed on 4 H100 GPUs configured with 4-way tensor 
+          parallelism and prefix caching enabled.
+        </p>
+        <p>
+          SuffixDecoding can be efficiently integrated into vLLM, a popular inference system used in production deployments, 
+          and effectively accelerate end-to-end agentic task completion time. Decoding time (i.e. output generation) takes a 
+          majority of the time across all SWE-Bench tasks, dominating both prefilling and agentic actions. In this end-to-end 
+          scenario, SuffixDecoding outperforms PLD by <b>1.3–3×</b>, leading to a <b>1.8–4.5×</b> speculative speedup over vanilla decoding.
+        </p>
+      </div>
+    </div>
+
+  </div>
+
+  <div class="columns is-centered has-text-centered">
+    <div class="column is-four-fifths">
+      <br>
+      <h2 class="title is-5">Ablation Studies</h2>
+
+      <center>
+        <img src="./images/per_request_tree.png" alt="Per-Request Tree Ablation" width="70%" style="display: inline-block; margin-right: 2%;">
+        <img src="./images/global_suffix_tree_size_speedup.png" alt="Global Tree Size Speedup" width="45%" style="display: inline-block; margin-right: 2%;">
+        <img src="./images/global_suffix_tree_size_acceptance.png" alt="Global Tree Size Acceptance" width="45%" style="display: inline-block;">
+      </center>
+
+      <div class="content has-text-justified">
+        <p>
+          <b>Top:</b> Speedup factor for the tasks in AgenticSQL using only the global suffix tree, only the per-request 
+          suffix tree, and both. <b>Bottom Left & Right:</b> Speedup and acceptance rate vs global suffix tree size for Magicoder 
+          and Wildchat.
+        </p>
+        <p>
+          Ablation studies demonstrate the importance of each component in SuffixDecoding. Using both the global and per-request 
+          suffix trees performs better than using just one. The global tree outperforms the per-request tree on most tasks. 
+          Additionally, the speedup from SuffixDecoding continues to increase with more previous output examples, while the 
+          acceptance rate holds steady, indicating that SuffixDecoding can learn useful patterns even in workloads with lower 
+          token repetition.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- <div class="columns is-centered has-text-centered">
+    <div class="column is-four-fifths">
+      <br>
+      <h2 class="title is-5">AgenticSQL: Multi-Agent Workflow</h2>
+
+      <center><img src="./images/agentic-sql.png" alt="AgenticSQL Architecture" width="60%"></center>
+
+      <div class="content has-text-justified">
+        <p>
+          <b>AgenticSQL is a multi-agent workflow</b> consisting of structured generation, unstructured generation, and 
+          retrieval-augmented generation steps across several different LLMs. Useful features are extracted from the user 
+          question (Classify and Extract) and supplemented with retrieved context (Enrich). Several text-to-SQL steps propose 
+          solutions to the user question (SQL 1...N) in parallel with feedback from an error corrector. A last Combine step 
+          synthesizes the proposed SQL candidates into a final SQL query and text response.
+        </p>
+      </div>
+    </div>
+  </div> -->
+
+</section>
+
+<hr>
+
+<section class="section">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered has-text-centered">
+      <div class="column is-four-fifths">
+        <h2 class="title is-3">Frequently Asked Questions</h2>
+      </div>
+    </div>
+
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <div class="content has-text-justified">
+          
+          <details style="margin-bottom: 1.5rem; border: 1px solid #dbdbdb; border-radius: 6px; padding: 1rem;">
+            <summary style="cursor: pointer; font-weight: 600; font-size: 1.15rem; user-select: none;">
+              <i class="fas fa-chevron-right" style="transition: transform 0.2s; margin-right: 0.5rem;"></i>
+              How much memory does SuffixDecoding require?
+            </summary>
+            <div style="margin-top: 1rem; padding-left: 1.5rem;">
+              <p>
+                SuffixDecoding is highly memory efficient. The suffix trees scale linearly with the number of cached tokens:
+              </p>
+              <ul>
+                <li><b>20K requests (~572M tokens):</b> ~6.15 GB of CPU memory</li>
+                <li><b>Per-token memory:</b> ~10.75 bytes/token</li>
+                <li><b>Typical capacity:</b> Can cache 31 days of continuous generation on a standard A100 system (144GB CPU memory) before requiring cache eviction</li>
+              </ul>
+              <p>
+                Lookup and update times remain fast (~4 microseconds per token for updates, ~12 microseconds for lookups) even with large trees.
+              </p>
+            </div>
+          </details>
+
+          <details style="margin-bottom: 1.5rem; border: 1px solid #dbdbdb; border-radius: 6px; padding: 1rem;">
+            <summary style="cursor: pointer; font-weight: 600; font-size: 1.15rem; user-select: none;">
+              <i class="fas fa-chevron-right" style="transition: transform 0.2s; margin-right: 0.5rem;"></i>
+              What happens when the input distribution shifts?
+            </summary>
+            <div style="margin-top: 1rem; padding-left: 1.5rem;">
+              <p>
+                SuffixDecoding adapts online to distribution shifts. In our experiments, when switching from WildChat to SpiderSQL 
+                (a significant distribution shift), SuffixDecoding initially achieves 1.5× speedup. However, it quickly adapts by 
+                inserting new outputs into its global suffix tree. After processing just 500 requests from the new distribution, 
+                SuffixDecoding's performance becomes almost indistinguishable from training on that distribution offline. This 
+                demonstrates strong online adaptation capabilities.
+              </p>
+            </div>
+          </details>
+
+          <details style="margin-bottom: 1.5rem; border: 1px solid #dbdbdb; border-radius: 6px; padding: 1rem;">
+            <summary style="cursor: pointer; font-weight: 600; font-size: 1.15rem; user-select: none;">
+              <i class="fas fa-chevron-right" style="transition: transform 0.2s; margin-right: 0.5rem;"></i>
+              How can I predict if SuffixDecoding will work well for my application?
+            </summary>
+            <div style="margin-top: 1rem; padding-left: 1.5rem;">
+              <p>
+                You can measure the "structuredness" of your task using empirical entropy with just 100 example outputs:
+              </p>
+              <ol>
+                <li>Create a suffix tree from 100 example model outputs</li>
+                <li>Calculate the entropy of each node's output distribution</li>
+                <li>Compute a weighted average across all nodes</li>
+              </ol>
+              <p>
+                Lower average entropy indicates more predictable outputs and better SuffixDecoding performance. For reference:
+              </p>
+              <ul>
+                <li><b>AgenticSQL Extract:</b> 0.086 entropy → 9.85× speedup</li>
+                <li><b>AgenticSQL Enrich:</b> 0.171 entropy → 10.41× speedup</li>
+                <li><b>SpiderSQL:</b> 2.50 entropy → 2.19× speedup</li>
+                <li><b>WildChat (open-ended chat):</b> 3.43 entropy → modest speedup</li>
+              </ul>
+            </div>
+          </details>
+
+          <details style="margin-bottom: 1.5rem; border: 1px solid #dbdbdb; border-radius: 6px; padding: 1rem;">
+            <summary style="cursor: pointer; font-weight: 600; font-size: 1.15rem; user-select: none;">
+              <i class="fas fa-chevron-right" style="transition: transform 0.2s; margin-right: 0.5rem;"></i>
+              Should I use SuffixDecoding alone or in hybrid mode?
+            </summary>
+            <div style="margin-top: 1rem; padding-left: 1.5rem;">
+              <p>
+                The choice depends on your workload:
+              </p>
+              <ul>
+                <li><b>Highly repetitive agentic tasks:</b> Use SuffixDecoding alone (threshold τ = 0) for best performance. 
+                On AgenticSQL, this achieves 5.35× speedup.</li>
+                <li><b>Mixed or open-ended workloads:</b> Use hybrid mode with threshold τ ≈ mean accepted tokens of your 
+                fallback model-based speculator. For example, with EAGLE-3 (MAT ≈ 4.65), setting τ = 5-7 achieves 2.5× 
+                speedup on Spec-Bench.</li>
+              </ul>
+            </div>
+          </details>
+
+          <details style="margin-bottom: 1.5rem; border: 1px solid #dbdbdb; border-radius: 6px; padding: 1rem;">
+            <summary style="cursor: pointer; font-weight: 600; font-size: 1.15rem; user-select: none;">
+              <i class="fas fa-chevron-right" style="transition: transform 0.2s; margin-right: 0.5rem;"></i>
+              Can SuffixDecoding work with batch serving?
+            </summary>
+            <div style="margin-top: 1rem; padding-left: 1.5rem;">
+              <p>
+                Yes! SuffixDecoding is compatible with batch-level speculation control methods like TurboSpec and AdaServe. 
+                By dynamically adjusting the number of speculative tokens per request based on the suffix tree scores, 
+                SuffixDecoding can be integrated to maximize batch-wise goodput or meet per-request SLO targets. The 
+                statistics-based scoring in SuffixDecoding can help determine which requests in a batch should receive 
+                more speculation budget.
+              </p>
+            </div>
+          </details>
+
+          <details style="margin-bottom: 1.5rem; border: 1px solid #dbdbdb; border-radius: 6px; padding: 1rem;">
+            <summary style="cursor: pointer; font-weight: 600; font-size: 1.15rem; user-select: none;">
+              <i class="fas fa-chevron-right" style="transition: transform 0.2s; margin-right: 0.5rem;"></i>
+              How long does it take to build the suffix tree?
+            </summary>
+            <div style="margin-top: 1rem; padding-left: 1.5rem;">
+              <p>
+                Suffix tree construction is fast and only needs to be done once when starting the inference server:
+              </p>
+              <ul>
+                <li><b>1,000 examples:</b> 0.30 seconds, 137 MB</li>
+                <li><b>10,000 examples:</b> 4.82 seconds, 1.4 GB</li>
+                <li><b>100,000 examples:</b> 61.95 seconds, 14.7 GB</li>
+              </ul>
+              <p>
+                This is a one-time cost, and the tree can be updated incrementally during serving with minimal overhead.
+              </p>
+            </div>
+          </details>
+
+          <details style="margin-bottom: 1.5rem; border: 1px solid #dbdbdb; border-radius: 6px; padding: 1rem;">
+            <summary style="cursor: pointer; font-weight: 600; font-size: 1.15rem; user-select: none;">
+              <i class="fas fa-chevron-right" style="transition: transform 0.2s; margin-right: 0.5rem;"></i>
+              Does SuffixDecoding preserve the output distribution?
+            </summary>
+            <div style="margin-top: 1rem; padding-left: 1.5rem;">
+              <p>
+                Yes! SuffixDecoding uses speculative decoding, which is mathematically guaranteed to preserve the exact output 
+                distribution of the target LLM. In our end-to-end vLLM experiments on SWE-Bench Verified, SuffixDecoding 
+                achieved the same 37.2% task completion rate as vanilla decoding while providing 1.8-4.5× speedup.
+              </p>
+            </div>
+          </details>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr>
+
+
+<section class="section" id="BibTeX">
+  <div class="container is-max-desktop content">
+    <h2 class="title">BibTeX</h2>
+    <pre><code>@inproceedings{oliaro2025suffixdecoding,
+  author    = {Gabriele Oliaro and Zhihao Jia and Daniel Campos and Aurick Qiao},
+  title     = {SuffixDecoding: Extreme Speculative Decoding for Emerging AI Applications},
+  booktitle = {The Thirty-ninth Annual Conference on Neural Information Processing Systems},
+  year      = {2025},
+  url       = {https://arxiv.org/abs/2411.04975}
+}</code></pre>
+  </div>
+</section>
+
+<!-- <hr>
+<section class="section">
+  <div class="container is-max-desktop">
+        <h2 class="title is-3">Acknowledgement</h2>
+        <div class="content has-text-justified">
+          We thank the Snowflake AI Research team and the CMU Catalyst group for their valuable feedback and support.
+        </div>
+    </div> -->
+
+</section>
+
+
+
+<footer class="footer">
+  <div class="container">
+    <div class="columns is-centered">
+      <div class="column is-8">
+        <div class="content">
+          <p style="text-align:right;font-size:small;">
+          <a href="https://github.com/nerfies/nerfies.github.io">
+            Webpage template credits.
+          </a>
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>
