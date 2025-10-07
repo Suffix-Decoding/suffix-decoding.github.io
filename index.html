@@ -370,7 +370,7 @@
     <div class="columns is-centered">
       <div class="column is-four-fifths">
         <div class="content has-text-justified">
-          
+
           <details style="margin-bottom: 1.5rem; border: 1px solid #dbdbdb; border-radius: 6px; padding: 1rem;">
             <summary style="cursor: pointer; font-weight: 600; font-size: 1.15rem; user-select: none;">
               <i class="fas fa-chevron-right" style="transition: transform 0.2s; margin-right: 0.5rem;"></i>
@@ -403,6 +403,40 @@
                 inserting new outputs into its global suffix tree. After processing just 500 requests from the new distribution, 
                 SuffixDecoding's performance becomes almost indistinguishable from training on that distribution offline. This 
                 demonstrates strong online adaptation capabilities.
+              </p>
+            </div>
+          </details>
+
+          <details style="margin-bottom: 1.5rem; border: 1px solid #dbdbdb; border-radius: 6px; padding: 1rem;">
+            <summary style="cursor: pointer; font-weight: 600; font-size: 1.15rem; user-select: none;">
+              <i class="fas fa-chevron-right" style="transition: transform 0.2s; margin-right: 0.5rem;"></i>
+              What is AgenticSQL and why does SuffixDecoding work so well on it?
+            </summary>
+            <div style="margin-top: 1rem; padding-left: 1.5rem;">
+              <p>
+                <b>AgenticSQL</b> is a proprietary multi-agent workflow designed for complex SQL generation tasks. It consists of multiple LLM-powered stages working together to convert natural language questions into accurate SQL queries.
+              </p>
+              <center><img src="./images/agentic-sql.png" alt="AgenticSQL Architecture" width="80%" style="margin: 1rem 0;"></center>
+              <p>
+                The workflow includes several specialized stages:
+              </p>
+              <ul>
+                <li><b>Classify & Extract:</b> Analyzes the user question to extract useful features and metadata</li>
+                <li><b>Enrich:</b> Uses retrieval-augmented generation (RAG) to supplement the question with relevant context from documentation or schema information</li>
+                <li><b>SQL Generation (SQL 1...N):</b> Multiple parallel text-to-SQL agents propose different SQL solutions to the question, each with feedback from an error corrector</li>
+                <li><b>Combine:</b> Synthesizes all proposed SQL candidates into a final optimized SQL query and generates a natural language response</li>
+              </ul>
+              <p>
+                SuffixDecoding achieves exceptional performance on AgenticSQL (up to <b>10.41× speedup</b> on the Enrich task and <b>9.85× speedup</b> on Extract) because:
+              </p>
+              <ol>
+                <li><b>Structured outputs:</b> Each stage generates highly structured responses (JSON for Extract/Classify, SQL queries, etc.) that follow consistent patterns</li>
+                <li><b>Repetitive patterns:</b> Similar user questions lead to similar intermediate outputs, creating strong token-level repetition across requests</li>
+                <li><b>Schema consistency:</b> Database schemas, table names, and common SQL patterns repeat frequently within and across queries</li>
+                <li><b>Multi-stage workflow:</b> Outputs from early stages (like Classify and Extract) are frequently reused in later stages, creating additional opportunities for speculation</li>
+              </ol>
+              <p>
+                This demonstrates SuffixDecoding's strength on production agentic workflows where structured generation and repetitive patterns are common.
               </p>
             </div>
           </details>
