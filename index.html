@@ -40,8 +40,9 @@
   <meta name="citation_arxiv_id" content="arXiv:2411.04975">
   <meta name="citation_pdf_url" content="https://arxiv.org/pdf/2411.04975.pdf">
 
-  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro"
+  <link href="https://fonts.googleapis.com/css?family=Google+Sans|Noto+Sans|Castoro|Lato:wght@300;400;700;900"
         rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Texta:wght@400;700;900&display=swap" rel="stylesheet">
 
   <link rel="stylesheet" href="./static/css/bulma.min.css">
   <link rel="stylesheet" href="./static/css/bulma-carousel.min.css">
@@ -57,6 +58,47 @@
     }
     details > summary::-webkit-details-marker {
       display: none;
+    }
+    
+    /* Snowflake Brand Fonts */
+    .publication-title {
+      font-family: 'Texta', 'Google Sans', sans-serif !important;
+      font-weight: 900 !important;
+    }
+    
+    .publication-authors {
+      font-family: 'Lato', 'Noto Sans', sans-serif !important;
+      font-weight: 400 !important;
+    }
+    
+    h1, h2, h3, h4, h5, h6 {
+      font-family: 'Texta', 'Google Sans', sans-serif !important;
+    }
+    
+    body, p, div, span {
+      font-family: 'Lato', 'Noto Sans', sans-serif !important;
+    }
+    
+    /* Snowflake Brand Button Styling */
+    .external-link.button {
+      background-color: #11567F !important;
+      border-color: #11567F !important;
+      color: white !important;
+      font-family: 'Texta', 'Google Sans', sans-serif !important;
+      font-weight: 900 !important;
+      text-transform: uppercase !important;
+      letter-spacing: 0.5px !important;
+      border-radius: 80px !important;
+      padding: 12px 27px !important;
+      height: 34px !important;
+      transition: all 0.3s ease !important;
+    }
+    
+    .external-link.button:hover {
+      background-color: #29B5E8 !important;
+      border-color: #29B5E8 !important;
+      transform: translateY(-1px) !important;
+      box-shadow: 0 4px 8px rgba(17, 86, 127, 0.3) !important;
     }
   </style>
 
