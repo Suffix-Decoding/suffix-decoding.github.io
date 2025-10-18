@@ -54,8 +54,58 @@
   <link rel="icon" type="image/svg+xml" href="./images/suffix-logo-min.svg">
   <link rel="icon" type="image/png" href="./images/suffix-logo-min.png">
   <style>
+    :root {
+      /* Light mode colors */
+      --bg-primary: #ffffff;
+      --bg-secondary: #f8f9fa;
+      --text-primary: #333333;
+      --text-secondary: #666666;
+      --text-muted: #888888;
+      --border-color: #e1e5e9;
+      --shadow: rgba(0, 0, 0, 0.1);
+      --accent-color: #11567F;
+      --accent-hover: #29B5E8;
+    }
+
+    [data-theme="dark"] {
+      /* Dark mode colors */
+      --bg-primary: #1a1a1a;
+      --bg-secondary: #2d2d2d;
+      --text-primary: #ffffff;
+      --text-secondary: #cccccc;
+      --text-muted: #999999;
+      --border-color: #404040;
+      --shadow: rgba(0, 0, 0, 0.3);
+      --accent-color: #29B5E8;
+      --accent-hover: #11567F;
+    }
+
+    body {
+      background-color: var(--bg-primary);
+      color: var(--text-primary);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+
+    .hero {
+      background-color: var(--bg-primary);
+    }
+
+    .section {
+      background-color: var(--bg-primary);
+    }
+
+    .footer {
+      background-color: var(--bg-secondary);
+    }
+
+    details {
+      background-color: var(--bg-secondary);
+      border-color: var(--border-color);
+    }
+
     details > summary {
       list-style: none;
+      color: var(--text-primary);
     }
     details > summary::-webkit-details-marker {
       display: none;
@@ -65,6 +115,7 @@
     .publication-title {
       font-family: 'Texta', 'Google Sans', sans-serif !important;
       font-weight: 900 !important;
+      color: var(--accent-color) !important;
     }
     
     .publication-authors {
@@ -74,16 +125,30 @@
     
     h1, h2, h3, h4, h5, h6 {
       font-family: 'Texta', 'Google Sans', sans-serif !important;
+      color: var(--accent-color) !important;
+    }
+
+    /* Target Bulma title classes specifically */
+    .title {
+      color: var(--accent-color) !important;
+    }
+
+    .title.is-1, .title.is-2, .title.is-3, .title.is-4, .title.is-5, .title.is-6 {
+      color: var(--accent-color) !important;
     }
     
     body, p, div, span {
       font-family: 'Lato', 'Noto Sans', sans-serif !important;
     }
+
+    .content {
+      color: var(--text-primary);
+    }
     
     /* Snowflake Brand Button Styling */
     .external-link.button {
-      background-color: #11567F !important;
-      border-color: #11567F !important;
+      background-color: var(--accent-color) !important;
+      border-color: var(--accent-color) !important;
       color: white !important;
       font-family: 'Texta', 'Google Sans', sans-serif !important;
       font-weight: 900 !important;
@@ -96,10 +161,46 @@
     }
     
     .external-link.button:hover {
-      background-color: #29B5E8 !important;
-      border-color: #29B5E8 !important;
+      background-color: var(--accent-hover) !important;
+      border-color: var(--accent-hover) !important;
       transform: translateY(-1px) !important;
-      box-shadow: 0 4px 8px rgba(17, 86, 127, 0.3) !important;
+      box-shadow: 0 4px 8px var(--shadow) !important;
+    }
+
+    /* Theme toggle button */
+    .theme-toggle {
+      position: fixed;
+      top: 20px;
+      right: 20px;
+      background: var(--accent-color);
+      color: white;
+      border: none;
+      border-radius: 50%;
+      width: 50px;
+      height: 50px;
+      cursor: pointer;
+      font-size: 20px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.3s ease;
+      z-index: 1000;
+      box-shadow: 0 2px 10px var(--shadow);
+    }
+
+    .theme-toggle:hover {
+      background: var(--accent-hover);
+      transform: scale(1.1);
+    }
+
+    /* Update author link colors */
+    .publication-authors a {
+      color: var(--accent-color) !important;
+    }
+
+    /* Update muted text */
+    .is-size-4 span {
+      color: var(--text-muted) !important;
     }
   </style>
 
@@ -110,6 +211,10 @@
   <script src="./static/js/index.js"></script>
 </head>
 <body>
+  <!-- Theme Toggle Button -->
+  <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+    <i class="fas fa-moon" id="theme-icon"></i>
+  </button>
 
 <section class="hero" style="margin-bottom: 0px;">
   <div class="hero-body">
@@ -118,7 +223,7 @@
         <div class="column has-text-centered">
           <div style="display: flex; align-items: center; justify-content: center; margin-bottom: 10px; gap: 20px;">
             <img src="./images/suffix-logo-min.png" alt="SuffixDecoding Logo" style="max-height: 120px; width: auto;">
-            <h1 class="title is-2 publication-title" style="color: #11567F; margin: 0;">SuffixDecoding: Extreme Speculative Decoding <br>for Emerging AI Applications</h1>
+            <h1 class="title is-2 publication-title" style="margin: 0;">SuffixDecoding: Extreme Speculative Decoding <br>for Emerging AI Applications</h1>
           </div>
           <div class="is-size-4" style="margin-top: 10px; margin-bottom: 20px;">
             <span style="color: #888888; font-weight: 400;">
@@ -127,13 +232,13 @@
           </div>
           <div class="is-size-5 publication-authors">
             <span class="author-block">
-              <a href="https://www.gabrieleoliaro.com/" style="color: #11567F !important;">Gabriele Oliaro<sup>1,2</sup></a></span>
+              <a href="https://www.gabrieleoliaro.com/">Gabriele Oliaro<sup>1,2</sup></a></span>
               <span class="author-block", style="padding-left:30px">
-                <a href="https://www.cs.cmu.edu/~zhihaoj2/" style="color: #11567F !important;">Zhihao Jia<sup>2</sup></a></span>
+                <a href="https://www.cs.cmu.edu/~zhihaoj2/">Zhihao Jia<sup>2</sup></a></span>
                 <span class="author-block", style="padding-left:30px">
-                  <a href="https://spacemanidol.com/" style="color: #11567F !important;">Daniel Campos<sup>1</sup></a></span>
+                  <a href="https://spacemanidol.com/">Daniel Campos<sup>1</sup></a></span>
                   <span class="author-block", style="padding-left:30px">
-                    <a href="https://www.snowflake.com/en/blog/authors/aurick-qiao/" style="color: #11567F !important;">Aurick Qiao<sup>1</sup></a></span>
+                    <a href="https://www.snowflake.com/en/blog/authors/aurick-qiao/">Aurick Qiao<sup>1</sup></a></span>
           </div>
 
           <div class="is-size-5 publication-authors">
@@ -633,5 +738,65 @@
   </div>
 </footer>
 
+  <script>
+    // Theme management
+    (function() {
+      const themeToggle = document.getElementById('theme-toggle');
+      const themeIcon = document.getElementById('theme-icon');
+      const body = document.body;
+      
+      // Get saved theme or default to system preference
+      function getInitialTheme() {
+        const savedTheme = localStorage.getItem('theme');
+        if (savedTheme) {
+          return savedTheme;
+        }
+        
+        // Check system preference
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+          return 'dark';
+        }
+        return 'light';
+      }
+      
+      // Apply theme
+      function applyTheme(theme) {
+        if (theme === 'dark') {
+          body.setAttribute('data-theme', 'dark');
+          themeIcon.className = 'fas fa-sun';
+          themeToggle.setAttribute('aria-label', 'Switch to light mode');
+        } else {
+          body.setAttribute('data-theme', 'light');
+          themeIcon.className = 'fas fa-moon';
+          themeToggle.setAttribute('aria-label', 'Switch to dark mode');
+        }
+        localStorage.setItem('theme', theme);
+      }
+      
+      // Toggle theme
+      function toggleTheme() {
+        const currentTheme = body.getAttribute('data-theme');
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        applyTheme(newTheme);
+      }
+      
+      // Initialize theme
+      const initialTheme = getInitialTheme();
+      applyTheme(initialTheme);
+      
+      // Add event listener
+      themeToggle.addEventListener('click', toggleTheme);
+      
+      // Listen for system theme changes
+      if (window.matchMedia) {
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+          // Only auto-switch if user hasn't manually set a preference
+          if (!localStorage.getItem('theme')) {
+            applyTheme(e.matches ? 'dark' : 'light');
+          }
+        });
+      }
+    })();
+  </script>
 </body>
 </html>
