@@ -202,6 +202,16 @@
     .is-size-4 span {
       color: var(--text-muted) !important;
     }
+
+    /* Integration banner link hover effects */
+    .integration-banner-link {
+      transition: transform 0.2s ease, opacity 0.2s ease !important;
+    }
+
+    .integration-banner-link:hover {
+      transform: translateY(-2px) !important;
+      opacity: 0.9 !important;
+    }
   </style>
 
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
@@ -215,6 +225,46 @@
   <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
     <i class="fas fa-moon" id="theme-icon"></i>
   </button>
+
+<!-- Integration Banner -->
+<section class="section" style="padding-top: 2rem; padding-bottom: 2rem; background-color: var(--bg-secondary); border-top: 2px solid var(--accent-color); border-bottom: 2px solid var(--accent-color);">
+  <div class="container is-max-desktop">
+    <div class="columns is-centered">
+      <div class="column is-four-fifths">
+        <div style="text-align: center;">
+          <p style="margin-bottom: 1rem; font-size: 1.1rem; font-weight: 600; color: var(--text-primary);">
+            <i class="fas fa-rocket" style="color: var(--accent-color); margin-right: 0.5rem;"></i>
+            Now Available in Production Frameworks
+          </p>
+          <div style="display: flex; align-items: center; justify-content: center; gap: 3rem; flex-wrap: wrap;">
+            <a href="https://docs.vllm.ai/en/latest/features/spec_decode/#speculating-using-suffix-decoding" 
+               target="_blank" 
+               rel="noopener noreferrer"
+               class="integration-banner-link"
+               style="display: flex; align-items: center; gap: 1rem; text-decoration: none; color: var(--text-primary);">
+              <img src="./images/vllm-logo.png" alt="vLLM Logo" style="height: 50px; width: auto;">
+              <div style="text-align: left;">
+                <div style="font-weight: 700; color: var(--accent-color);">Available Today!</div>
+                <div style="font-size: 0.9rem; color: var(--text-secondary);">vLLM</div>
+              </div>
+            </a>
+            <a href="https://github.com/sgl-project/sglang/pull/13553" 
+               target="_blank" 
+               rel="noopener noreferrer"
+               class="integration-banner-link"
+               style="display: flex; align-items: center; gap: 1rem; text-decoration: none; color: var(--text-primary);">
+              <img src="./images/sglang-logo.png" alt="SGLang Logo" style="height: 50px; width: auto;">
+              <div style="text-align: left;">
+                <div style="font-weight: 700; color: var(--accent-color);">PR under review</div>
+                <div style="font-size: 0.9rem; color: var(--text-secondary);">SGLang</div>
+              </div>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <section class="hero" style="margin-bottom: 0px;">
   <div class="hero-body">
@@ -285,6 +335,24 @@
                   <span>Blog Post</span>
                   </a>
               </span>
+              <span class="link-block">
+                <a href="https://neurips.cc/media/PosterPDFs/NeurIPS%202025/115453.png?t=1762494056.9963334"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-image"></i>
+                  </span>
+                  <span>Poster</span>
+                  </a>
+              </span>
+              <span class="link-block">
+                <a href="https://neurips.cc/media/neurips-2025/Slides/115453_4fbrXq1.pdf"
+                   class="external-link button is-normal is-rounded is-dark">
+                  <span class="icon">
+                      <i class="fas fa-file-powerpoint"></i>
+                  </span>
+                  <span>Slides</span>
+                  </a>
+              </span>
 
             </div>
 
@@ -293,7 +361,6 @@
     </div>
   </div>
 </section>
-
 
 <section class="hero teaser">
   <div class="container is-max-desktop">
